@@ -10,7 +10,7 @@ See your activity at a glance without opening GitHub in a browser.
 - Compact bar widget showing today's contribution count.
 - Interactive annual heatmap with per-day activity on hover.
 - Today, current streak, best streak, and annual contribution statistics.
-- Automatic refresh every 30 minutes and manual refresh from the panel.
+- Configurable automatic refresh every 15, 30, or 60 minutes, plus manual refresh from the panel.
 - Theme-aware colors that follow the active Noctalia palette.
 - Offline-friendly cache that preserves the latest successful result.
 
@@ -32,6 +32,9 @@ gh auth login -h github.com
 Enable **GitHub Activity** in Noctalia's plugin manager, add the `activity`
 widget to a bar, and click it to open the calendar. Right-click the widget or
 use the refresh button in the panel to update immediately.
+
+Choose the automatic refresh interval in Noctalia's plugin settings. The
+default is 30 minutes; 15- and 60-minute intervals are also available.
 
 The panel can also be toggled through IPC:
 

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-25
+
+### Added
+
+- Configurable automatic contribution refresh interval with 15-, 30-, and
+  60-minute options.
+
 ## [1.0.0] - 2026-08-24
 
 ### Added

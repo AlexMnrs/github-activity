@@ -1,7 +1,7 @@
 [[plugin]]
 id = "alexmnrs/github-activity"
 name = "GitHub Activity"
-version = "1.0.0"
+version = "1.1.0"
 author = "AlexMnrs"
 license = "MIT"
 icon = "brand-github"

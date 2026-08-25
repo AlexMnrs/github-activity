@@ -3,6 +3,17 @@
     "name": "GitHub Activity",
     "description": "A native GitHub contribution calendar for your Noctalia bar."
   },
+  "settings": {
+    "refresh_interval": {
+      "label": "Refresh interval",
+      "description": "How often GitHub contribution data refreshes automatically.",
+      "options": {
+        "fifteen": "Every 15 minutes",
+        "thirty": "Every 30 minutes",
+        "sixty": "Every 60 minutes"
+      }
+    }
+  },
   "widget": {
     "tooltip": "{login}\\nToday: {today} contributions\\nCurrent streak: {streak} days\\n{freshness}",
     "cached": "Cached data",
