@@ -7,7 +7,7 @@ See your activity at a glance without opening GitHub in a browser.
 
 ## Highlights
 
-- Compact bar widget showing today's contribution count.
+- Compact bar widget showing a configurable contribution metric or only the GitHub icon.
 - Interactive annual heatmap with per-day activity on hover.
 - Today, current streak, best streak, and annual contribution statistics.
 - Configurable automatic refresh every 15, 30, or 60 minutes, plus manual refresh from the panel.
@@ -37,6 +37,10 @@ Choose the automatic refresh interval in Noctalia's plugin settings. The
 default is 30 minutes; 15- and 60-minute intervals are also available.
 The widget tooltip and calendar panel show when contribution data was last
 updated and the selected automatic refresh interval.
+
+Each bar-widget instance can independently show only the GitHub icon or pair it
+with today's contributions, the current streak, or the annual contribution
+total. Configure these presentation choices from that widget's own settings.
 
 The panel can also be toggled through IPC:
 
