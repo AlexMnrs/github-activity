@@ -1,6 +1,6 @@
 --!nonstrict
 
-local Settings = require("../github-activity/lib/settings.luau")
+local Settings = require("../github-activity/lib/settings")
 
 local function equal(actual, expected, message)
   if actual ~= expected then

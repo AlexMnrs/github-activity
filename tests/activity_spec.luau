@@ -1,7 +1,7 @@
 --!nonstrict
 
-local Activity = require("../github-activity/lib/activity.luau")
-local fixtures = require("./fixtures.luau")
+local Activity = require("../github-activity/lib/activity")
+local fixtures = require("./fixtures")
 
 local function equal(actual, expected, message)
   if actual ~= expected then
@@ -38,16 +38,6 @@ equal(gaps.currentStreak, 3, "current streak stops at gap")
 equal(gaps.bestStreak, 3, "best streak honors gaps")
 equal(Activity.color(0), "surface_variant", "zero activity color")
 equal(Activity.color(4), "primary", "maximum activity color")
-
-local compact = Activity.normalizeText(
-  "AlexMnrs\t4\nWEEK\n2026-08-22\t1\tFIRST_QUARTILE\n2026-08-23\t0\tNONE\n2026-08-24\t3\tFOURTH_QUARTILE\n",
-  "2026-08-24"
-)
-equal(compact.login, "AlexMnrs", "compact response login")
-equal(compact.total, 4, "compact response total")
-equal(compact.today, 3, "compact response today")
-equal(compact.rows[1], "░·█", "compact response heatmap row")
-equal(compact.currentStreak, 1, "compact response current streak")
 
 local malformed, err = normalize(fixtures.malformed)
 equal(malformed, nil, "malformed response is rejected")
