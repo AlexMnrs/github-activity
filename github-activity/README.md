@@ -1,8 +1,9 @@
 # GitHub Activity
 
-A native GitHub contribution calendar for the Noctalia v5 bar. It displays
-today's contributions in a compact widget and opens an adaptive, theme-aware
-annual heatmap on click.
+A native GitHub contribution calendar for the Noctalia v5 bar. Its compact
+widget can show today's contributions, the current streak, the annual total,
+or only the GitHub icon, and opens an adaptive, theme-aware annual heatmap on
+click.
 
 ![GitHub Activity panel](thumbnail.webp)
 
@@ -38,10 +39,16 @@ gh auth login -h github.com
 | Setting | Options | Default |
 | --- | --- | --- |
 | Automatic refresh interval | 15, 30, or 60 minutes | 30 minutes |
+| Widget display | Icon and value, or icon only | Icon and value |
+| Widget metric | Today's contributions, current streak, or annual total | Today's contributions |
 
 Changing the interval applies it immediately and requests a refresh unless a
 request is already in progress. The widget tooltip and calendar panel show the
 last update time and selected automatic refresh interval.
+
+Widget display and metric choices belong to each bar-widget instance. Multiple
+copies of GitHub Activity can therefore show different metrics. The metric
+selector is relevant only when the widget is configured to show a value.
 
 The panel can also be toggled through IPC:
 

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Per-widget controls for showing only the GitHub icon or pairing it with
+  today's contributions, the current streak, or the annual contribution total.
+
 ## [1.2.1] - 2026-08-25
 
 ### Fixed

@@ -22,4 +22,19 @@ equal(Settings.refreshIntervalMs(15), 30 * 60 * 1000, "numeric refresh interval 
 equal(Settings.refreshIntervalMs({}), 30 * 60 * 1000, "table refresh interval defaults to 30 minutes")
 equal(Settings.refreshIntervalMinutes(nil), 30, "missing display interval defaults to 30 minutes")
 
+equal(Settings.widgetDisplayMode("icon_only"), "icon_only", "icon-only widget display mode")
+equal(Settings.widgetDisplayMode("icon_and_value"), "icon_and_value", "icon-and-value widget display mode")
+equal(Settings.widgetDisplayMode(nil), "icon_and_value", "missing widget display mode uses compatible default")
+equal(Settings.widgetDisplayMode("value_only"), "icon_and_value", "unsupported widget display mode uses compatible default")
+equal(Settings.widgetDisplayMode(1), "icon_and_value", "numeric widget display mode uses compatible default")
+equal(Settings.widgetDisplayMode({}), "icon_and_value", "table widget display mode uses compatible default")
+
+equal(Settings.widgetDisplayMetric("today"), "today", "today widget metric")
+equal(Settings.widgetDisplayMetric("current_streak"), "current_streak", "current-streak widget metric")
+equal(Settings.widgetDisplayMetric("year_total"), "year_total", "year-total widget metric")
+equal(Settings.widgetDisplayMetric(nil), "today", "missing widget metric uses compatible default")
+equal(Settings.widgetDisplayMetric("best_streak"), "today", "unsupported widget metric uses compatible default")
+equal(Settings.widgetDisplayMetric(1), "today", "numeric widget metric uses compatible default")
+equal(Settings.widgetDisplayMetric({}), "today", "table widget metric uses compatible default")
+
 print("GitHub Activity settings tests passed")

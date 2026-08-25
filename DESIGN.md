@@ -10,7 +10,7 @@ active Noctalia theme rather than a separate GitHub-branded application.
 
 | Surface | Purpose | Interaction |
 | --- | --- | --- |
-| Bar widget | Quiet at-a-glance status | Shows the GitHub glyph and today's contribution count. Left-click opens the calendar; right-click requests a refresh. |
+| Bar widget | Quiet at-a-glance status | Shows the GitHub glyph with a configurable contribution metric, or the glyph alone. Left-click opens the calendar; right-click requests a refresh. |
 | Calendar panel | Inspect annual activity and streaks | Opens attached to the widget, near the click when possible; hover a day to inspect its count; use Refresh to request new data; use Open profile to open the authenticated account on GitHub. |
 
 The panel is `680 × 430` and attached by default. Keep it compact enough for
