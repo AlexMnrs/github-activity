@@ -9,10 +9,13 @@ local refreshIntervalMinutes = {
   ["60"] = 60,
 }
 
-function Settings.refreshIntervalMs(value)
-  local minutes = type(value) == "string" and refreshIntervalMinutes[value]
+function Settings.refreshIntervalMinutes(value)
+  return type(value) == "string" and refreshIntervalMinutes[value]
     or DEFAULT_REFRESH_INTERVAL_MINUTES
-  return minutes * 60 * 1000
+end
+
+function Settings.refreshIntervalMs(value)
+  return Settings.refreshIntervalMinutes(value) * 60 * 1000
 end
 
 return Settings

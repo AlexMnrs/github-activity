@@ -35,6 +35,8 @@ use the refresh button in the panel to update immediately.
 
 Choose the automatic refresh interval in Noctalia's plugin settings. The
 default is 30 minutes; 15- and 60-minute intervals are also available.
+The widget tooltip and calendar panel show when contribution data was last
+updated and the selected automatic refresh interval.
 
 The panel can also be toggled through IPC:
 

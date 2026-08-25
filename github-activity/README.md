@@ -40,7 +40,8 @@ gh auth login -h github.com
 | Automatic refresh interval | 15, 30, or 60 minutes | 30 minutes |
 
 Changing the interval applies it immediately and requests a refresh unless a
-request is already in progress.
+request is already in progress. The widget tooltip and calendar panel show the
+last update time and selected automatic refresh interval.
 
 The panel can also be toggled through IPC:
 
