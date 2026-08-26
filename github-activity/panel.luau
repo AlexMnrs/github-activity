@@ -20,6 +20,18 @@ local gridPreparingDay = 1
 local gridReady = false
 local open = false
 local tr = noctalia.tr
+local showToday = Settings.panelElementVisible(noctalia.getConfig("show_today"))
+local showCurrentStreak = Settings.panelElementVisible(noctalia.getConfig("show_current_streak"))
+local showBestStreak = Settings.panelElementVisible(noctalia.getConfig("show_best_streak"))
+local showYearTotal = Settings.panelElementVisible(noctalia.getConfig("show_year_total"))
+local showProfileButton = Settings.panelElementVisible(noctalia.getConfig("show_profile_button"))
+local calendarExpanded = Settings.calendarExpanded(showToday, showCurrentStreak, showBestStreak)
+local calendarCellWidth = 10
+local calendarCellHeight = 12
+local calendarColumnGap = 1
+local calendarRowGap = calendarExpanded and 4 or 3
+local calendarHeaderHeight = calendarExpanded and 14 or 12
+local weekdayLabelFontSize = calendarExpanded and 12 or 11
 local monthNames = {
   tr("panel.months.jan"),
   tr("panel.months.feb"),
@@ -83,8 +95,8 @@ local function buildMonthHeader()
       return
     end
     table.insert(segments, ui.column({
-      width = segmentWeeks * 11 - 1,
-      height = 12,
+      width = segmentWeeks * (calendarCellWidth + calendarColumnGap) - calendarColumnGap,
+      height = calendarHeaderHeight,
       align = "center",
       justify = "center",
     }, {
@@ -108,7 +120,7 @@ local function buildMonthHeader()
   end
   appendSegment()
 
-  return ui.row({ gap = 1, align = "center" }, segments)
+  return ui.row({ gap = calendarColumnGap, align = "center" }, segments)
 end
 
 local function buildWeekdayLabels()
@@ -117,19 +129,19 @@ local function buildWeekdayLabels()
   for day = 1, 7 do
     table.insert(labels, ui.column({
       width = 30,
-      height = 12,
+      height = calendarCellHeight,
       align = "end",
       justify = "center",
     }, {
       ui.label({
         text = names[day],
-        fontSize = 11,
+        fontSize = weekdayLabelFontSize,
         color = "on_surface_variant",
         textAlign = "end",
       }),
     }))
   end
-  return ui.column({ gap = 3, align = "end" }, labels)
+  return ui.column({ gap = calendarRowGap, align = "end" }, labels)
 end
 
 local function prepareGridDay()
@@ -164,18 +176,18 @@ local function prepareGridColumns()
           key = key,
           fill = Activity.color(gridLevels[day][gridWeek]),
           radius = 2,
-          width = 10,
-          height = 12,
+          width = calendarCellWidth,
+          height = calendarCellHeight,
           onHover = "onDayHover",
         }))
       end
     end
-    table.insert(gridColumns, ui.column({ key = "week-" .. tostring(gridWeek), gap = 3, align = "center" }, cells))
+    table.insert(gridColumns, ui.column({ key = "week-" .. tostring(gridWeek), gap = calendarRowGap, align = "center" }, cells))
     gridWeek = gridWeek + 1
   end
 
   if gridWeek > gridWeekCount then
-    cachedHeatmap = ui.row({ gap = 1, align = "start" }, gridColumns)
+    cachedHeatmap = ui.row({ gap = calendarColumnGap, align = "start" }, gridColumns)
     cachedCalendar = ui.row({ gap = 10, align = "end", justify = "center" }, {
       buildWeekdayLabels(),
       ui.column({ gap = 6, align = "start" }, {
@@ -272,25 +284,48 @@ function render()
     local day = selectedDay()
     local selectedText = day ~= nil
       and tr("panel.day_total", { date = day.date, count = day.count })
-      or tr("panel.year_total", { login = data.login, count = data.total })
+      or (showYearTotal and tr("panel.year_total", { login = data.login, count = data.total }) or "")
     table.insert(body, ui.label({ text = selectedText, height = 14, fontSize = 11, color = "on_surface_variant", textAlign = "center" }))
     table.insert(body, ui.label({ text = refreshSchedule(), height = 12, fontSize = 10, color = "on_surface_variant", textAlign = "center" }))
-    table.insert(body, ui.separator({ thickness = 1, color = "outline/0.35" }))
-    table.insert(body, ui.row({ gap = 14, align = "stretch" }, {
-      metric(tr("metric.today"), data.today, activityBlocks(data.today > 0 and 1 or 0, 1)),
-      ui.separator({ orientation = "vertical", thickness = 1, color = "outline/0.35" }),
-      metric(
+
+    local metrics = {}
+    if showToday then
+      table.insert(metrics, metric(tr("metric.today"), data.today, activityBlocks(data.today > 0 and 1 or 0, 1)))
+    end
+    if showCurrentStreak then
+      table.insert(metrics, metric(
         tr("metric.current_streak"),
         data.currentStreak,
         activityBlocks(math.min(data.currentStreak, 12), math.max(1, math.min(data.currentStreak, 12)))
-      ),
-      ui.separator({ orientation = "vertical", thickness = 1, color = "outline/0.35" }),
-      metric(tr("metric.best_streak"), data.bestStreak, activityBlocks(math.min(data.bestStreak, 12), 12)),
-    }))
+      ))
+    end
+    if showBestStreak then
+      table.insert(metrics, metric(tr("metric.best_streak"), data.bestStreak, activityBlocks(math.min(data.bestStreak, 12), 12)))
+    end
+
+    if #metrics > 0 then
+      local metricChildren = {}
+      for index, item in ipairs(metrics) do
+        if index > 1 then
+          table.insert(metricChildren, ui.separator({ orientation = "vertical", thickness = 1, color = "outline/0.35" }))
+        end
+        table.insert(metricChildren, item)
+      end
+      table.insert(body, ui.separator({ thickness = 1, color = "outline/0.35" }))
+      table.insert(body, ui.row({ gap = 14, align = "stretch" }, metricChildren))
+    end
   end
 
-  table.insert(root, ui.column({ gap = 12, paddingH = 18, paddingV = 14, fill = "surface", flexGrow = 1 }, body))
-  if data ~= nil and cachedCalendar ~= nil then
+  local centerReadyContent = calendarExpanded and data ~= nil and cachedCalendar ~= nil
+  table.insert(root, ui.column({
+    gap = centerReadyContent and 8 or 12,
+    paddingH = 18,
+    paddingV = 14,
+    fill = "surface",
+    flexGrow = 1,
+    justify = centerReadyContent and "center" or "start",
+  }, body))
+  if data ~= nil and cachedCalendar ~= nil and showProfileButton then
     table.insert(root, ui.separator({ thickness = 1, color = "outline/0.35" }))
     table.insert(root, ui.row({ justify = "end", paddingH = 14, paddingV = 10 }, {
       ui.button({ text = tr("action.open_profile"), glyph = "external-link", variant = "outline", onClick = "onOpenProfile" }),

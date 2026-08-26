@@ -22,7 +22,12 @@ it.
 - Use Noctalia semantic theme colors, typography, controls, separators, and
   iconography. Do not introduce fixed GitHub-green palettes or custom fonts.
 - The panel hierarchy is: header and refresh action; calendar; contextual
-  annual or hovered-day summary; three metrics; profile action.
+  annual or hovered-day summary; configurable metrics; optional profile action.
+- When all three metrics are hidden, use a focused layout: keep the calendar
+  cells at their standard size, add more row spacing, then center the ready
+  calendar, summary, and refresh feedback within the fixed panel body. Keep
+  its width fixed so every contribution week remains visible, and preserve the
+  hovered-day text even when the annual summary is hidden.
 - The heatmap uses seven weekday rows and consecutive week columns. Its five
   intensity levels map from `surface_variant` through increasing `primary`
   opacity to `primary`. Cells remain individually hoverable.

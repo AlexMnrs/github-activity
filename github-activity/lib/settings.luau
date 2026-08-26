@@ -39,4 +39,15 @@ function Settings.widgetDisplayMetric(value)
     or DEFAULT_WIDGET_DISPLAY_METRIC
 end
 
+function Settings.panelElementVisible(value)
+  if type(value) == "boolean" then
+    return value
+  end
+  return true
+end
+
+function Settings.calendarExpanded(showToday, showCurrentStreak, showBestStreak)
+  return not showToday and not showCurrentStreak and not showBestStreak
+end
+
 return Settings

@@ -42,6 +42,12 @@ Each bar-widget instance can independently show only the GitHub icon or pair it
 with today's contributions, the current streak, or the annual contribution
 total. Configure these presentation choices from that widget's own settings.
 
+The calendar panel can independently hide today's contributions, both streak
+metrics, the annual total, and the profile action. When all three metrics are
+hidden, the fixed-size panel expands and centers the calendar, its contextual
+detail, and refresh feedback for better legibility while keeping every week
+visible.
+
 The panel can also be toggled through IPC:
 
 ```bash

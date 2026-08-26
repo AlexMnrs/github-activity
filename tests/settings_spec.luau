@@ -37,4 +37,28 @@ equal(Settings.widgetDisplayMetric("best_streak"), "today", "unsupported widget 
 equal(Settings.widgetDisplayMetric(1), "today", "numeric widget metric uses compatible default")
 equal(Settings.widgetDisplayMetric({}), "today", "table widget metric uses compatible default")
 
+equal(Settings.panelElementVisible(true), true, "enabled panel elements remain visible")
+equal(Settings.panelElementVisible(false), false, "disabled panel elements hide")
+equal(Settings.panelElementVisible(nil), true, "missing panel elements remain visible")
+equal(Settings.panelElementVisible("false"), true, "string panel elements remain visible")
+equal(Settings.panelElementVisible(0), true, "numeric panel elements remain visible")
+equal(Settings.panelElementVisible({}), true, "table panel elements remain visible")
+
+for _, combination in ipairs({
+  { true, true, true, false },
+  { true, true, false, false },
+  { true, false, true, false },
+  { true, false, false, false },
+  { false, true, true, false },
+  { false, true, false, false },
+  { false, false, true, false },
+  { false, false, false, true },
+}) do
+  equal(
+    Settings.calendarExpanded(combination[1], combination[2], combination[3]),
+    combination[4],
+    "calendar expansion matches metric visibility"
+  )
+end
+
 print("GitHub Activity settings tests passed")
