@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Per-panel controls for contribution summaries, streak metrics, and the
+  profile action, including a centered, expanded calendar layout when all
+  metrics are hidden.
+
+### Changed
+
+- Calendar month and weekday labels now follow the system date locale through
+  Noctalia's date formatter.
+
+## [1.3.0] - 2026-08-25
+
+### Added
+
 - Per-widget controls for showing only the GitHub icon or pairing it with
   today's contributions, the current streak, or the annual contribution total.
 

@@ -62,6 +62,32 @@ function Activity.flatten(weeks)
   return days
 end
 
+-- Parse an ISO calendar date as local noon. Noon avoids DST boundary changes,
+-- while the round trip rejects values that os.time would otherwise normalize.
+function Activity.dateTimestamp(value)
+  if type(value) ~= "string" then
+    return nil
+  end
+
+  local year, month, day = string.match(value, "^(%d%d%d%d)%-(%d%d)%-(%d%d)$")
+  if year == nil then
+    return nil
+  end
+
+  local timestamp = os.time({
+    year = tonumber(year),
+    month = tonumber(month),
+    day = tonumber(day),
+    hour = 12,
+  })
+
+  if type(timestamp) ~= "number" or os.date("%Y-%m-%d", timestamp) ~= value then
+    return nil
+  end
+
+  return timestamp
+end
+
 function Activity.streaks(days, todayDate)
   local best = 0
   local running = 0

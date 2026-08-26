@@ -20,20 +20,18 @@ local gridPreparingDay = 1
 local gridReady = false
 local open = false
 local tr = noctalia.tr
-local monthNames = {
-  tr("panel.months.jan"),
-  tr("panel.months.feb"),
-  tr("panel.months.mar"),
-  tr("panel.months.apr"),
-  tr("panel.months.may"),
-  tr("panel.months.jun"),
-  tr("panel.months.jul"),
-  tr("panel.months.aug"),
-  tr("panel.months.sep"),
-  tr("panel.months.oct"),
-  tr("panel.months.nov"),
-  tr("panel.months.dec"),
-}
+local showToday = Settings.panelElementVisible(noctalia.getConfig("show_today"))
+local showCurrentStreak = Settings.panelElementVisible(noctalia.getConfig("show_current_streak"))
+local showBestStreak = Settings.panelElementVisible(noctalia.getConfig("show_best_streak"))
+local showYearTotal = Settings.panelElementVisible(noctalia.getConfig("show_year_total"))
+local showProfileButton = Settings.panelElementVisible(noctalia.getConfig("show_profile_button"))
+local calendarExpanded = Settings.calendarExpanded(showToday, showCurrentStreak, showBestStreak)
+local calendarCellWidth = 10
+local calendarCellHeight = 12
+local calendarColumnGap = 1
+local calendarRowGap = calendarExpanded and 4 or 3
+local calendarHeaderHeight = calendarExpanded and 14 or 12
+local weekdayLabelFontSize = calendarExpanded and 12 or 11
 
 local function requestRefresh()
   noctalia.state.set("refresh_request", noctalia.nowMs())
@@ -61,13 +59,35 @@ local function resetGrid(source)
   gridWeekCount = 0
 end
 
-local function monthForWeek(week)
+local function detailDate(day, week)
+  local rawDetail = (gridDetails[day] or {})[week] or ""
+  return string.match(rawDetail, "^([^|]+)|")
+end
+
+local function formatDate(pattern, date)
+  local timestamp = Activity.dateTimestamp(date)
+  if timestamp == nil then
+    return ""
+  end
+  return noctalia.formatTime(pattern, timestamp)
+end
+
+local function representativeDateForWeek(week)
   local preferredDays = { 4, 1, 2, 3, 5, 6, 7 }
   for _, day in ipairs(preferredDays) do
-    local rawDetail = (gridDetails[day] or {})[week] or ""
-    local date = string.match(rawDetail, "^([^|]+)|")
+    local date = detailDate(day, week)
     if date ~= nil then
-      return tonumber(string.sub(date, 6, 7))
+      return date
+    end
+  end
+  return nil
+end
+
+local function representativeDateForDay(day)
+  for week = 1, gridWeekCount do
+    local date = detailDate(day, week)
+    if date ~= nil then
+      return date
     end
   end
   return nil
@@ -75,21 +95,22 @@ end
 
 local function buildMonthHeader()
   local segments = {}
-  local segmentMonth = nil
+  local segmentKey = nil
+  local segmentDate = nil
   local segmentWeeks = 0
 
   local function appendSegment()
-    if segmentMonth == nil or segmentWeeks == 0 then
+    if segmentKey == nil or segmentWeeks == 0 then
       return
     end
     table.insert(segments, ui.column({
-      width = segmentWeeks * 11 - 1,
-      height = 12,
+      width = segmentWeeks * (calendarCellWidth + calendarColumnGap) - calendarColumnGap,
+      height = calendarHeaderHeight,
       align = "center",
       justify = "center",
     }, {
       ui.label({
-        text = segmentWeeks >= 2 and (monthNames[segmentMonth] or "") or "",
+        text = segmentWeeks >= 2 and formatDate("%b", segmentDate) or "",
         fontSize = 10,
         color = "on_surface_variant",
         textAlign = "center",
@@ -98,38 +119,40 @@ local function buildMonthHeader()
   end
 
   for week = 1, gridWeekCount do
-    local month = monthForWeek(week)
-    if segmentMonth ~= nil and month ~= segmentMonth then
+    local date = representativeDateForWeek(week)
+    local monthKey = date ~= nil and string.sub(date, 1, 7) or nil
+    if segmentKey ~= nil and monthKey ~= nil and monthKey ~= segmentKey then
       appendSegment()
       segmentWeeks = 0
     end
-    segmentMonth = month or segmentMonth
+    segmentKey = monthKey or segmentKey
+    segmentDate = date or segmentDate
     segmentWeeks = segmentWeeks + 1
   end
   appendSegment()
 
-  return ui.row({ gap = 1, align = "center" }, segments)
+  return ui.row({ gap = calendarColumnGap, align = "center" }, segments)
 end
 
 local function buildWeekdayLabels()
-  local names = { "", tr("panel.weekdays.mon"), "", tr("panel.weekdays.wed"), "", tr("panel.weekdays.fri"), "" }
   local labels = {}
   for day = 1, 7 do
+    local date = (day == 2 or day == 4 or day == 6) and representativeDateForDay(day) or nil
     table.insert(labels, ui.column({
       width = 30,
-      height = 12,
+      height = calendarCellHeight,
       align = "end",
       justify = "center",
     }, {
       ui.label({
-        text = names[day],
-        fontSize = 11,
+        text = date ~= nil and formatDate("%a", date) or "",
+        fontSize = weekdayLabelFontSize,
         color = "on_surface_variant",
         textAlign = "end",
       }),
     }))
   end
-  return ui.column({ gap = 3, align = "end" }, labels)
+  return ui.column({ gap = calendarRowGap, align = "end" }, labels)
 end
 
 local function prepareGridDay()
@@ -164,18 +187,18 @@ local function prepareGridColumns()
           key = key,
           fill = Activity.color(gridLevels[day][gridWeek]),
           radius = 2,
-          width = 10,
-          height = 12,
+          width = calendarCellWidth,
+          height = calendarCellHeight,
           onHover = "onDayHover",
         }))
       end
     end
-    table.insert(gridColumns, ui.column({ key = "week-" .. tostring(gridWeek), gap = 3, align = "center" }, cells))
+    table.insert(gridColumns, ui.column({ key = "week-" .. tostring(gridWeek), gap = calendarRowGap, align = "center" }, cells))
     gridWeek = gridWeek + 1
   end
 
   if gridWeek > gridWeekCount then
-    cachedHeatmap = ui.row({ gap = 1, align = "start" }, gridColumns)
+    cachedHeatmap = ui.row({ gap = calendarColumnGap, align = "start" }, gridColumns)
     cachedCalendar = ui.row({ gap = 10, align = "end", justify = "center" }, {
       buildWeekdayLabels(),
       ui.column({ gap = 6, align = "start" }, {
@@ -272,25 +295,48 @@ function render()
     local day = selectedDay()
     local selectedText = day ~= nil
       and tr("panel.day_total", { date = day.date, count = day.count })
-      or tr("panel.year_total", { login = data.login, count = data.total })
+      or (showYearTotal and tr("panel.year_total", { login = data.login, count = data.total }) or "")
     table.insert(body, ui.label({ text = selectedText, height = 14, fontSize = 11, color = "on_surface_variant", textAlign = "center" }))
     table.insert(body, ui.label({ text = refreshSchedule(), height = 12, fontSize = 10, color = "on_surface_variant", textAlign = "center" }))
-    table.insert(body, ui.separator({ thickness = 1, color = "outline/0.35" }))
-    table.insert(body, ui.row({ gap = 14, align = "stretch" }, {
-      metric(tr("metric.today"), data.today, activityBlocks(data.today > 0 and 1 or 0, 1)),
-      ui.separator({ orientation = "vertical", thickness = 1, color = "outline/0.35" }),
-      metric(
+
+    local metrics = {}
+    if showToday then
+      table.insert(metrics, metric(tr("metric.today"), data.today, activityBlocks(data.today > 0 and 1 or 0, 1)))
+    end
+    if showCurrentStreak then
+      table.insert(metrics, metric(
         tr("metric.current_streak"),
         data.currentStreak,
         activityBlocks(math.min(data.currentStreak, 12), math.max(1, math.min(data.currentStreak, 12)))
-      ),
-      ui.separator({ orientation = "vertical", thickness = 1, color = "outline/0.35" }),
-      metric(tr("metric.best_streak"), data.bestStreak, activityBlocks(math.min(data.bestStreak, 12), 12)),
-    }))
+      ))
+    end
+    if showBestStreak then
+      table.insert(metrics, metric(tr("metric.best_streak"), data.bestStreak, activityBlocks(math.min(data.bestStreak, 12), 12)))
+    end
+
+    if #metrics > 0 then
+      local metricChildren = {}
+      for index, item in ipairs(metrics) do
+        if index > 1 then
+          table.insert(metricChildren, ui.separator({ orientation = "vertical", thickness = 1, color = "outline/0.35" }))
+        end
+        table.insert(metricChildren, item)
+      end
+      table.insert(body, ui.separator({ thickness = 1, color = "outline/0.35" }))
+      table.insert(body, ui.row({ gap = 14, align = "stretch" }, metricChildren))
+    end
   end
 
-  table.insert(root, ui.column({ gap = 12, paddingH = 18, paddingV = 14, fill = "surface", flexGrow = 1 }, body))
-  if data ~= nil and cachedCalendar ~= nil then
+  local centerReadyContent = calendarExpanded and data ~= nil and cachedCalendar ~= nil
+  table.insert(root, ui.column({
+    gap = centerReadyContent and 8 or 12,
+    paddingH = 18,
+    paddingV = 14,
+    fill = "surface",
+    flexGrow = 1,
+    justify = centerReadyContent and "center" or "start",
+  }, body))
+  if data ~= nil and cachedCalendar ~= nil and showProfileButton then
     table.insert(root, ui.separator({ thickness = 1, color = "outline/0.35" }))
     table.insert(root, ui.row({ justify = "end", paddingH = 14, paddingV = 10 }, {
       ui.button({ text = tr("action.open_profile"), glyph = "external-link", variant = "outline", onClick = "onOpenProfile" }),

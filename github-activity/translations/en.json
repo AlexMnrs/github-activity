@@ -29,6 +29,28 @@
         "current_streak": "Current streak",
         "year_total": "Contributions in the last year"
       }
+    },
+    "panel_content": {
+      "show_today": {
+        "label": "Show today's contributions",
+        "description": "Show the contribution count for today below the calendar."
+      },
+      "show_current_streak": {
+        "label": "Show current streak",
+        "description": "Show the current contribution streak below the calendar."
+      },
+      "show_best_streak": {
+        "label": "Show best streak",
+        "description": "Show the longest contribution streak below the calendar."
+      },
+      "show_year_total": {
+        "label": "Show annual total",
+        "description": "Show the annual contribution total when no calendar day is selected."
+      },
+      "show_profile_button": {
+        "label": "Show profile button",
+        "description": "Show the button for opening the GitHub profile."
+      }
     }
   },
   "widget": {
@@ -40,26 +62,7 @@
     "title": "GitHub Activity",
     "year_total": "{login} · {count} contributions in the last year",
     "day_total": "{date} · {count} contributions",
-    "preparing": "Preparing interactive calendar…",
-    "months": {
-      "jan": "Jan",
-      "feb": "Feb",
-      "mar": "Mar",
-      "apr": "Apr",
-      "may": "May",
-      "jun": "Jun",
-      "jul": "Jul",
-      "aug": "Aug",
-      "sep": "Sep",
-      "oct": "Oct",
-      "nov": "Nov",
-      "dec": "Dec"
-    },
-    "weekdays": {
-      "mon": "Mon",
-      "wed": "Wed",
-      "fri": "Fri"
-    }
+    "preparing": "Preparing interactive calendar…"
   },
   "metric": {
     "today": "Today",

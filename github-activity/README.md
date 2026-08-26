@@ -41,6 +41,11 @@ gh auth login -h github.com
 | Automatic refresh interval | 15, 30, or 60 minutes | 30 minutes |
 | Widget display | Icon and value, or icon only | Icon and value |
 | Widget metric | Today's contributions, current streak, or annual total | Today's contributions |
+| Show today's contributions | On or off | On |
+| Show current streak | On or off | On |
+| Show best streak | On or off | On |
+| Show annual total | On or off | On |
+| Show profile button | On or off | On |
 
 Changing the interval applies it immediately and requests a refresh unless a
 request is already in progress. The widget tooltip and calendar panel show the
@@ -49,6 +54,15 @@ last update time and selected automatic refresh interval.
 Widget display and metric choices belong to each bar-widget instance. Multiple
 copies of GitHub Activity can therefore show different metrics. The metric
 selector is relevant only when the widget is configured to show a value.
+
+Panel content choices apply to the shared calendar panel. Hiding the annual
+total leaves the hovered-day detail available. Hiding today's contributions,
+the current streak, and the best streak together adds row spacing and centers
+the ready content for a more legible focused view.
+
+Plugin interface text comes from `translations/en.json` and is translated
+through Noctalia Translate. Calendar month and weekday labels instead use
+Noctalia's date formatter and follow the process `LC_TIME` locale.
 
 The panel can also be toggled through IPC:
 
