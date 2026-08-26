@@ -32,20 +32,6 @@ local calendarColumnGap = 1
 local calendarRowGap = calendarExpanded and 4 or 3
 local calendarHeaderHeight = calendarExpanded and 14 or 12
 local weekdayLabelFontSize = calendarExpanded and 12 or 11
-local monthNames = {
-  tr("panel.months.jan"),
-  tr("panel.months.feb"),
-  tr("panel.months.mar"),
-  tr("panel.months.apr"),
-  tr("panel.months.may"),
-  tr("panel.months.jun"),
-  tr("panel.months.jul"),
-  tr("panel.months.aug"),
-  tr("panel.months.sep"),
-  tr("panel.months.oct"),
-  tr("panel.months.nov"),
-  tr("panel.months.dec"),
-}
 
 local function requestRefresh()
   noctalia.state.set("refresh_request", noctalia.nowMs())
@@ -73,13 +59,35 @@ local function resetGrid(source)
   gridWeekCount = 0
 end
 
-local function monthForWeek(week)
+local function detailDate(day, week)
+  local rawDetail = (gridDetails[day] or {})[week] or ""
+  return string.match(rawDetail, "^([^|]+)|")
+end
+
+local function formatDate(pattern, date)
+  local timestamp = Activity.dateTimestamp(date)
+  if timestamp == nil then
+    return ""
+  end
+  return noctalia.formatTime(pattern, timestamp)
+end
+
+local function representativeDateForWeek(week)
   local preferredDays = { 4, 1, 2, 3, 5, 6, 7 }
   for _, day in ipairs(preferredDays) do
-    local rawDetail = (gridDetails[day] or {})[week] or ""
-    local date = string.match(rawDetail, "^([^|]+)|")
+    local date = detailDate(day, week)
     if date ~= nil then
-      return tonumber(string.sub(date, 6, 7))
+      return date
+    end
+  end
+  return nil
+end
+
+local function representativeDateForDay(day)
+  for week = 1, gridWeekCount do
+    local date = detailDate(day, week)
+    if date ~= nil then
+      return date
     end
   end
   return nil
@@ -87,11 +95,12 @@ end
 
 local function buildMonthHeader()
   local segments = {}
-  local segmentMonth = nil
+  local segmentKey = nil
+  local segmentDate = nil
   local segmentWeeks = 0
 
   local function appendSegment()
-    if segmentMonth == nil or segmentWeeks == 0 then
+    if segmentKey == nil or segmentWeeks == 0 then
       return
     end
     table.insert(segments, ui.column({
@@ -101,7 +110,7 @@ local function buildMonthHeader()
       justify = "center",
     }, {
       ui.label({
-        text = segmentWeeks >= 2 and (monthNames[segmentMonth] or "") or "",
+        text = segmentWeeks >= 2 and formatDate("%b", segmentDate) or "",
         fontSize = 10,
         color = "on_surface_variant",
         textAlign = "center",
@@ -110,12 +119,14 @@ local function buildMonthHeader()
   end
 
   for week = 1, gridWeekCount do
-    local month = monthForWeek(week)
-    if segmentMonth ~= nil and month ~= segmentMonth then
+    local date = representativeDateForWeek(week)
+    local monthKey = date ~= nil and string.sub(date, 1, 7) or nil
+    if segmentKey ~= nil and monthKey ~= nil and monthKey ~= segmentKey then
       appendSegment()
       segmentWeeks = 0
     end
-    segmentMonth = month or segmentMonth
+    segmentKey = monthKey or segmentKey
+    segmentDate = date or segmentDate
     segmentWeeks = segmentWeeks + 1
   end
   appendSegment()
@@ -124,9 +135,9 @@ local function buildMonthHeader()
 end
 
 local function buildWeekdayLabels()
-  local names = { "", tr("panel.weekdays.mon"), "", tr("panel.weekdays.wed"), "", tr("panel.weekdays.fri"), "" }
   local labels = {}
   for day = 1, 7 do
+    local date = (day == 2 or day == 4 or day == 6) and representativeDateForDay(day) or nil
     table.insert(labels, ui.column({
       width = 30,
       height = calendarCellHeight,
@@ -134,7 +145,7 @@ local function buildWeekdayLabels()
       justify = "center",
     }, {
       ui.label({
-        text = names[day],
+        text = date ~= nil and formatDate("%a", date) or "",
         fontSize = weekdayLabelFontSize,
         color = "on_surface_variant",
         textAlign = "end",

@@ -48,6 +48,10 @@ hidden, the fixed-size panel expands and centers the calendar, its contextual
 detail, and refresh feedback for better legibility while keeping every week
 visible.
 
+Plugin interface text is provided through Noctalia Translate. Calendar month
+and weekday labels use Noctalia's date formatter, so they follow the process
+`LC_TIME` locale.
+
 The panel can also be toggled through IPC:
 
 ```bash

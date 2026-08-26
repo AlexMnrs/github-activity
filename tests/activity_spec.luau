@@ -13,6 +13,22 @@ local function normalize(fixture)
   return Activity.normalize(fixture, "2026-08-24")
 end
 
+local validDate = Activity.dateTimestamp("2026-08-24")
+if type(validDate) ~= "number" then
+  error("valid ISO date should produce a timestamp")
+end
+equal(os.date("%Y-%m-%d", validDate), "2026-08-24", "valid date round trip")
+
+local leapDate = Activity.dateTimestamp("2024-02-29")
+if type(leapDate) ~= "number" then
+  error("leap day should produce a timestamp")
+end
+equal(os.date("%Y-%m-%d", leapDate), "2024-02-29", "leap date round trip")
+
+equal(Activity.dateTimestamp("2026-2-3"), nil, "invalid date format is rejected")
+equal(Activity.dateTimestamp("2026-02-30"), nil, "impossible date is rejected")
+equal(Activity.dateTimestamp({}), nil, "invalid date type is rejected")
+
 local empty = normalize(fixtures.empty)
 equal(empty.today, 0, "empty calendar today")
 equal(empty.currentStreak, 0, "empty calendar current streak")

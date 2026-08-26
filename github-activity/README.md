@@ -60,6 +60,10 @@ total leaves the hovered-day detail available. Hiding today's contributions,
 the current streak, and the best streak together adds row spacing and centers
 the ready content for a more legible focused view.
 
+Plugin interface text comes from `translations/en.json` and is translated
+through Noctalia Translate. Calendar month and weekday labels instead use
+Noctalia's date formatter and follow the process `LC_TIME` locale.
+
 The panel can also be toggled through IPC:
 
 ```bash
